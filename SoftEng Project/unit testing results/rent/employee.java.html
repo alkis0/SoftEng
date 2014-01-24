@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>employee.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;Rent2&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">rent</a> &gt; <span class="el_source">employee.java</span></div><h1>employee.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package rent;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+/**
+ *
+ * @author user
+ */
+public class employee extends User{
+
+	public employee(String username,String password,int id){
+<span class="fc" id="L29">		super(username,password,id,2);</span>
+		
+<span class="fc" id="L31">	}</span>
+	
+	public int insert_model(Connection con,Statement st,ResultSet rs,String type,String name,String brand,int CC,int price){
+		String query;
+	
+<span class="pc bpc" id="L36" title="1 of 4 branches missed.">		if(!type.equals(&quot;car&quot;) &amp;&amp; !type.equals(&quot;cycle&quot;)) return 1;</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">		if(name.length()&lt;2) return 2;</span>
+<span class="pc bpc" id="L38" title="8 of 18 branches missed.">		if(!brand.equals(&quot;BMW&quot;) &amp;&amp; !brand.equals(&quot;Audi&quot;) &amp;&amp; !brand.equals(&quot;Fiat&quot;) &amp;&amp; !brand.equals(&quot;Mercedes&quot;)&amp;&amp; !brand.equals(&quot;Fiat&quot;) </span>
+		&amp;&amp; !brand.equals(&quot;Golf&quot;) &amp;&amp; !brand.equals(&quot;Seat&quot;) &amp;&amp; !brand.equals(&quot;Ford&quot;) &amp;&amp; !brand.equals(&quot;Toyota&quot;)) 
+<span class="fc" id="L40">			return 3;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">		if(CC&lt;=0)return 4;</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">		if(price&lt;=0) return 5;</span>
+		try{
+<span class="fc" id="L44">			PreparedStatement ps=con.prepareStatement(&quot;insert into storage(type,name,brand,CC,rented,price) values(?,?,?,?,?,?)&quot;);</span>
+<span class="fc" id="L45">			ps.setString(1, type);</span>
+<span class="fc" id="L46">			ps.setString(2, name);</span>
+<span class="fc" id="L47">			ps.setString(3, brand);</span>
+<span class="fc" id="L48">			ps.setInt(4, CC);</span>
+<span class="fc" id="L49">			ps.setString(5, &quot;no&quot;);</span>
+<span class="fc" id="L50">			ps.setInt(6, price);</span>
+<span class="fc" id="L51">			ps.addBatch();</span>
+			
+<span class="fc" id="L53">			ps.execute();</span>
+<span class="pc" id="L54">		}catch(SQLException e){System.err.println(e);return -1;}</span>
+<span class="fc" id="L55">		return 0;</span>
+	}
+	
+	
+	public int remove_model(Connection con,Statement st,ResultSet rs,int id){
+		
+<span class="fc" id="L61">		String query=&quot;delete from storage where id=&quot;+id;</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">		if(id&lt;0) return -1;</span>
+		try{
+<span class="fc" id="L64">			int ret=st.executeUpdate(query);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">			if(ret==0) return 1;</span>
+<span class="fc" id="L66">		}catch(Exception e){System.err.println(e);return -2;}</span>
+		
+		
+<span class="fc" id="L69">		return 0;</span>
+	}
+	
+	public ResultSet show_storage(Connection con,Statement st,ResultSet rs){
+<span class="fc" id="L73">		String query=&quot;select * from storage&quot;;</span>
+		try{
+<span class="fc" id="L75">			rs=st.executeQuery(query);</span>
+<span class="fc" id="L76">		}catch(Exception e){System.err.println(e);return null;}</span>
+<span class="fc" id="L77">		return rs;</span>
+	
+	}
+	
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

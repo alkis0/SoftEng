@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>customer.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;Rent2&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">rent</a> &gt; <span class="el_source">customer.java</span></div><h1>customer.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package rent;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.logging.MemoryHandler;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author user
+ */
+
+//first type of user.
+public class customer extends User {
+
+	public customer(String username,String password,int id){
+<span class="fc" id="L27">		super(username,password,id,1);</span>
+<span class="fc" id="L28">	}</span>
+	
+	
+	/**
+	 * public ResultSet show_rents.Returns the result of selection query for success and null 
+	 * for fail.
+	 *
+	 */
+	public ResultSet show_rents(Connection con,Statement st,ResultSet rs){
+<span class="fc" id="L37">		String query=&quot;select * from rent where user_id=&quot;+this.id;</span>
+		try{
+<span class="fc" id="L39">			rs=st.executeQuery(query);</span>
+<span class="fc" id="L40">		}catch(Exception e){System.err.println(&quot;Error in show_rents &quot;+e);return null;}</span>
+<span class="fc" id="L41">		return rs;</span>
+	
+	}
+	/***
+	 *	public int delete_rents.Clears the user rent car.Returns 0 for success
+	 *  and other error codes:1 for empty cart,-1 for backend error.
+	 * 
+	 * 
+	 */
+	public int delete_rents(Connection con,Statement st,ResultSet rs){
+		
+		String query;			
+		try{
+			
+<span class="fc" id="L55">			query=&quot;select * from rent where user_id=&quot;+this.id;</span>
+<span class="fc" id="L56">			rs=st.executeQuery(query);</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">			if(rs.next()==false){</span>
+<span class="fc" id="L58">				return 1;</span>
+			}else{
+				//ArrayList that contains the product id of all rented items of user.
+<span class="fc" id="L61">				ArrayList&lt;Object&gt; product_id=new ArrayList&lt;Object&gt;();</span>
+				int p;
+<span class="fc" id="L63">				int i=0;</span>
+				do{
+<span class="fc" id="L65">					p=rs.getInt(&quot;product_id&quot;);</span>
+<span class="fc" id="L66">					product_id.add(p);</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">				}while(rs.next());	</span>
+<span class="fc" id="L68">				int j=product_id.size();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">				for(i=0;i&lt;j;i++){</span>
+					//foreach product id update the storage table and set rented=no.
+					//System.out.println(product_id.get(i));
+<span class="fc" id="L72">					query=&quot;update storage set rented='no' where id=&quot;+product_id.get(i);</span>
+<span class="fc" id="L73">					st.executeUpdate(query);</span>
+				}
+				//finally delete the rent table records for user.
+<span class="fc" id="L76">				query=&quot;delete from rent where user_id=&quot;+this.id;</span>
+<span class="fc" id="L77">				st.executeUpdate(query);</span>
+				
+			}
+<span class="pc" id="L80">		}catch(Exception e){System.err.println(e);return -1;};</span>
+		
+<span class="fc" id="L82">		return 0;</span>
+	
+	}
+	
+	
+	/**
+	 *	Public int rent.User rents a product.Return 0 for success and other error codes:
+	 *	1 for product not found,2 for product already rented,-1 for backend error.
+	 * 
+	 * 
+	 */
+	
+	public int rent(int selection_id,String type,String brand,Connection con,Statement st,ResultSet rs,boolean brandBased){
+		
+					String rented;
+					String query;
+					
+					//if the rent action is brandBased (from menu selection) then the customer can rent from the product list that
+					//appears in screen.
+					//else 
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">					if(brandBased) query=&quot;select * from storage where type='&quot;+type+&quot;' and brand='&quot;+brand+&quot;' and id=&quot;+selection_id;</span>
+					else{
+<span class="nc" id="L104">						ArrayList&lt;Object&gt; items=GUI.items_list;</span>
+<span class="nc" id="L105">						boolean ok=false;</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">						for(int i=0;i&lt;items.size();i++)</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">							if(selection_id==(int)items.get(i)) ok=true;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">						if(ok) query=&quot;select * from storage where id=&quot;+selection_id;</span>
+<span class="nc" id="L109">						else return 1;</span>
+					}
+					try{
+<span class="fc" id="L112">						rs=st.executeQuery(query);</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">						if(rs.next()==false){</span>
+							//model not found error code=1
+<span class="fc" id="L115">							return 1;</span>
+							
+						}
+						else{
+<span class="fc" id="L119">							int product_id=rs.getInt(&quot;id&quot;);</span>
+<span class="fc" id="L120">							type=rs.getString(&quot;type&quot;);</span>
+<span class="fc" id="L121">							String name=rs.getString(&quot;name&quot;);</span>
+<span class="fc" id="L122">							brand=rs.getString(&quot;brand&quot;);</span>
+<span class="fc" id="L123">							int price=rs.getInt(&quot;price&quot;);</span>
+<span class="fc" id="L124">							rented=rs.getString(&quot;rented&quot;);</span>
+
+<span class="fc bfc" id="L126" title="All 2 branches covered.">							if(rented.equals(&quot;no&quot;))	{</span>
+<span class="fc" id="L127">								query=&quot;update storage set rented='yes' where id=&quot;+product_id;</span>
+<span class="fc" id="L128">								st.executeUpdate(query);</span>
+<span class="fc" id="L129">								PreparedStatement ps=con.prepareStatement(&quot;insert into rent values(?,?,?,?,?,?)&quot;);</span>
+<span class="fc" id="L130">								ps.setInt(1,this.id);</span>
+<span class="fc" id="L131">								ps.setInt(2,product_id);</span>
+<span class="fc" id="L132">								ps.setString(3,type);</span>
+<span class="fc" id="L133">								ps.setString(4,name);</span>
+<span class="fc" id="L134">								ps.setString(5,brand);</span>
+<span class="fc" id="L135">								ps.setInt(6,price);</span>
+<span class="fc" id="L136">								ps.addBatch();</span>
+
+<span class="fc" id="L138">								ps.execute();</span>
+<span class="fc" id="L139">							}else{</span>
+								//product already rented error code=2
+<span class="fc" id="L141">								return 2;</span>
+							}
+
+							
+						}
+<span class="fc" id="L146">					}catch(Exception e){</span>
+<span class="fc" id="L147">						System.err.println(e);</span>
+<span class="fc" id="L148">						return -1;</span>
+<span class="fc" id="L149">					}</span>
+
+					//succes code = 0
+<span class="fc" id="L152">					return 0;</span>
+				
+	
+	}
+	
+	
+	
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

@@ -1,0 +1,908 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GUI.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;Rent2&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">rent</a> &gt; <span class="el_source">GUI.java</span></div><h1>GUI.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package rent;
+
+import com.sun.corba.se.impl.logging.ORBUtilSystemException;
+import java.awt.Panel;
+import javax.swing.JOptionPane;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+
+     
+/**
+ *
+ * @author user
+ */
+public class GUI extends javax.swing.JFrame {
+<span class="fc" id="L35">	final private String con_host=&quot;jdbc:mysql://83.212.104.40:3306/garage&quot;;</span>
+<span class="fc" id="L36">	final private String con_user=&quot;root&quot;;</span>
+<span class="fc" id="L37">	final private String con_pass=&quot;mixaniki1992&quot;;</span>
+	
+	public Connection con;
+	public Statement st;
+	public ResultSet rs;
+<span class="fc" id="L42">	boolean logged_in=false;</span>
+<span class="fc" id="L43">	String tokens[]=new String[3];</span>
+<span class="fc" id="L44">	boolean brandBased=true;</span>
+	public static ArrayList&lt;Object&gt; items_list;
+<span class="fc" id="L46">	boolean test=false;</span>
+<span class="fc" id="L47">	int test_case=0;</span>
+	
+	User user;
+
+	
+<span class="fc" id="L52">	public GUI() {</span>
+		
+<span class="fc" id="L54">		initComponents();</span>
+<span class="fc" id="L55">		Results.setText(&quot;Welcome!&quot;);</span>
+<span class="fc" id="L56">		feature1.setVisible(false);</span>
+<span class="fc" id="L57">		feature2.setVisible(false);</span>
+<span class="fc" id="L58">		byname.setSelected(true);</span>
+<span class="fc" id="L59">		setVisible(true);</span>
+		//setSize(900,610);
+	
+		
+		
+<span class="fc" id="L64">	}</span>
+	public static ArrayList&lt;String&gt; panel(int in_number,String in_labels[],String title){
+<span class="nc" id="L66">		ArrayList&lt;String&gt; ret=new ArrayList&lt;String&gt;(in_number);</span>
+		
+				
+<span class="nc" id="L69">		JTextField txt[]=new JTextField[in_number];</span>
+<span class="nc" id="L70">		JPanel myPanel = new JPanel();</span>
+<span class="nc" id="L71">		myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.Y_AXIS));</span>
+		
+		
+<span class="nc bnc" id="L74" title="All 2 branches missed.">		for(int i=0;i&lt;in_number;i++){</span>
+<span class="nc" id="L75">			txt[i]=new JTextField(20);</span>
+<span class="nc" id="L76">			myPanel.add(new JLabel(in_labels[i]));</span>
+<span class="nc" id="L77">			myPanel.add(txt[i]);</span>
+		}
+		
+		
+
+<span class="nc" id="L82">		int result = JOptionPane.showConfirmDialog(null, myPanel, </span>
+				 title, JOptionPane.OK_CANCEL_OPTION);
+<span class="nc bnc" id="L84" title="All 2 branches missed.">		if (result == JOptionPane.OK_OPTION) {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">			for(int i=0;i&lt;in_number;i++){</span>
+<span class="nc" id="L86">				ret.add(txt[i].getText());</span>
+			}
+
+<span class="nc" id="L89">		}else return null;</span>
+		
+		
+<span class="nc" id="L92">		return ret;</span>
+	}
+	
+	
+	public static ArrayList&lt;String&gt; p_panel(int in_number,String in_labels[],int pass_pos,String title){
+<span class="nc" id="L97">		ArrayList&lt;String&gt; ret=new ArrayList&lt;String&gt;(in_number);</span>
+		
+				
+<span class="nc" id="L100">		JTextField txt[]=new JTextField[in_number-1];</span>
+<span class="nc" id="L101">		JPasswordField pw=new JPasswordField(20);</span>
+		
+<span class="nc" id="L103">		JPanel myPanel = new JPanel();</span>
+<span class="nc" id="L104">		myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.Y_AXIS));</span>
+		
+<span class="nc" id="L106">		int k=0;</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">		for(int i=0;i&lt;in_number;i++){	</span>
+			
+<span class="nc" id="L109">			myPanel.add(new JLabel(in_labels[i]));</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">			if(i==pass_pos) myPanel.add(pw);</span>
+			else{ 
+<span class="nc" id="L112">				txt[k]=new JTextField(20);</span>
+<span class="nc" id="L113">				myPanel.add(txt[k++]);</span>
+			}
+		}
+		
+<span class="nc" id="L117">		k=0;</span>
+
+<span class="nc" id="L119">		int result = JOptionPane.showConfirmDialog(null, myPanel, </span>
+				 title, JOptionPane.OK_CANCEL_OPTION);
+<span class="nc bnc" id="L121" title="All 2 branches missed.">		if (result == JOptionPane.OK_OPTION) {</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">			for(int i=0;i&lt;in_number;i++){</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">				if(i==pass_pos) ret.add(new String(pw.getPassword()));</span>
+<span class="nc" id="L124">				else ret.add(txt[k++].getText());</span>
+			}
+
+<span class="nc" id="L127">		}else return null;</span>
+		
+		
+<span class="nc" id="L130">		return ret;</span>
+	}
+	
+	
+	public void eternal(){
+		while(true){
+			try{
+<span class="nc" id="L137">				Thread.sleep(40);</span>
+<span class="nc" id="L138">			}catch(Exception e){}</span>
+			
+			
+<span class="nc bnc" id="L141" title="All 2 branches missed.">			if(quality.isSelected()){</span>
+<span class="nc" id="L142">				low_prices.setEnabled(false);</span>
+<span class="nc" id="L143">				quality.setEnabled(true);</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">			}else if(low_prices.isSelected()){</span>
+<span class="nc" id="L145">				low_prices.setEnabled(true);</span>
+<span class="nc" id="L146">				quality.setEnabled(false);</span>
+			}else{
+<span class="nc" id="L148">				low_prices.setEnabled(true);</span>
+<span class="nc" id="L149">				quality.setEnabled(true);</span>
+			}
+		}			
+		
+	}
+	
+	
+	public boolean print(int field_num,String field_title[],String field_name[],ResultSet rs) throws SQLException{
+<span class="fc bfc" id="L157" title="All 2 branches covered.">		if(rs.next()==false) return false;</span>
+		else{
+<span class="fc" id="L159">			Results.setText(&quot;&quot;);</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">			for(int i=0;i&lt;field_num;i++){</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">				if(i==field_num-1)</span>
+<span class="fc" id="L162">					Results.append(field_title[i]+&quot;\n&quot;);</span>
+				
+				else
+<span class="fc" id="L165">					Results.append(field_title[i]+&quot;\t&quot;);</span>
+			}
+			do{
+<span class="fc bfc" id="L168" title="All 2 branches covered.">				for(int i=0;i&lt;field_num;i++){</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">					if(i==field_num-1)</span>
+<span class="fc" id="L170">						Results.append(rs.getString(field_name[i])+&quot;\n&quot;);</span>
+					else
+<span class="fc" id="L172">						Results.append(rs.getString(field_name[i])+&quot;\t&quot;);</span>
+				
+				}
+<span class="fc bfc" id="L175" title="All 2 branches covered.">			}while(rs.next());</span>
+			
+		}
+		
+<span class="fc" id="L179">		return true;</span>
+	}
+	
+
+	
+	public boolean connect(String host,String username,String password){
+		try{
+<span class="fc" id="L186">			Class.forName(&quot;com.mysql.jdbc.Driver&quot;);</span>
+<span class="fc" id="L187">			con=DriverManager.getConnection(host,username,password);</span>
+<span class="fc" id="L188">			st=con.createStatement();</span>
+<span class="nc" id="L189">		}catch(Exception e){</span>
+<span class="nc" id="L190">			System.err.println(e);return false;</span>
+<span class="fc" id="L191">		}</span>
+<span class="fc" id="L192">		return true;</span>
+	}
+	
+	
+
+
+	/**
+	 * This method is called from within the constructor to initialize the form.
+	 * WARNING: Do NOT modify this code. The content of this method is always
+ regenerated by the GUI Editor.
+	 */
+	@SuppressWarnings(&quot;unchecked&quot;)
+    // &lt;editor-fold defaultstate=&quot;collapsed&quot; desc=&quot;Generated Code&quot;&gt;//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+<span class="fc" id="L207">        name_brand = new javax.swing.ButtonGroup();</span>
+<span class="fc" id="L208">        jTextField1 = new javax.swing.JTextField();</span>
+<span class="fc" id="L209">        Scroll = new javax.swing.JScrollPane();</span>
+<span class="fc" id="L210">        Results = new javax.swing.JTextArea();</span>
+<span class="fc" id="L211">        search_text = new javax.swing.JTextField();</span>
+<span class="fc" id="L212">        SearchButton = new javax.swing.JButton();</span>
+<span class="fc" id="L213">        choice = new javax.swing.JTextField();</span>
+<span class="fc" id="L214">        jScrollPane1 = new javax.swing.JScrollPane();</span>
+<span class="fc" id="L215">        Menu = new javax.swing.JTree();</span>
+<span class="fc" id="L216">        login = new javax.swing.JButton();</span>
+<span class="fc" id="L217">        greeting = new javax.swing.JLabel();</span>
+<span class="fc" id="L218">        feature3 = new javax.swing.JButton();</span>
+<span class="fc" id="L219">        feature1 = new javax.swing.JButton();</span>
+<span class="fc" id="L220">        feature2 = new javax.swing.JButton();</span>
+<span class="fc" id="L221">        low_prices = new javax.swing.JCheckBox();</span>
+<span class="fc" id="L222">        quality = new javax.swing.JCheckBox();</span>
+<span class="fc" id="L223">        byname = new javax.swing.JRadioButton();</span>
+<span class="fc" id="L224">        bybrand = new javax.swing.JRadioButton();</span>
+
+<span class="fc" id="L226">        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);</span>
+
+<span class="fc" id="L228">        jTextField1.setText(&quot;www.rent.com&quot;);</span>
+
+<span class="fc" id="L230">        Results.setColumns(20);</span>
+<span class="fc" id="L231">        Results.setRows(5);</span>
+<span class="fc" id="L232">        Scroll.setViewportView(Results);</span>
+
+<span class="fc" id="L234">        search_text.setText(&quot;Search&quot;);</span>
+
+<span class="fc" id="L236">        SearchButton.setLabel(&quot;Search&quot;);</span>
+<span class="fc" id="L237">        SearchButton.addActionListener(new java.awt.event.ActionListener() {</span>
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+<span class="fc" id="L239">                SearchButtonActionPerformed(evt);</span>
+<span class="fc" id="L240">            }</span>
+        });
+
+<span class="fc" id="L243">        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Products&quot;);</span>
+<span class="fc" id="L244">        javax.swing.tree.DefaultMutableTreeNode treeNode2 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Cars&quot;);</span>
+<span class="fc" id="L245">        javax.swing.tree.DefaultMutableTreeNode treeNode3 = new javax.swing.tree.DefaultMutableTreeNode(&quot;BMW&quot;);</span>
+<span class="fc" id="L246">        treeNode2.add(treeNode3);</span>
+<span class="fc" id="L247">        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Audi&quot;);</span>
+<span class="fc" id="L248">        treeNode2.add(treeNode3);</span>
+<span class="fc" id="L249">        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Mercedes&quot;);</span>
+<span class="fc" id="L250">        treeNode2.add(treeNode3);</span>
+<span class="fc" id="L251">        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Fiat&quot;);</span>
+<span class="fc" id="L252">        treeNode2.add(treeNode3);</span>
+<span class="fc" id="L253">        treeNode1.add(treeNode2);</span>
+<span class="fc" id="L254">        treeNode2 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Motorcycles&quot;);</span>
+<span class="fc" id="L255">        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode(&quot;BMW&quot;);</span>
+<span class="fc" id="L256">        treeNode2.add(treeNode3);</span>
+<span class="fc" id="L257">        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Kawasaki&quot;);</span>
+<span class="fc" id="L258">        treeNode2.add(treeNode3);</span>
+<span class="fc" id="L259">        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Harley&quot;);</span>
+<span class="fc" id="L260">        treeNode2.add(treeNode3);</span>
+<span class="fc" id="L261">        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode(&quot;Scooter&quot;);</span>
+<span class="fc" id="L262">        treeNode2.add(treeNode3);</span>
+<span class="fc" id="L263">        treeNode1.add(treeNode2);</span>
+<span class="fc" id="L264">        Menu.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));</span>
+<span class="fc" id="L265">        Menu.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {</span>
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+<span class="fc" id="L267">                MenuValueChanged(evt);</span>
+<span class="fc" id="L268">            }</span>
+        });
+<span class="fc" id="L270">        jScrollPane1.setViewportView(Menu);</span>
+
+<span class="fc" id="L272">        login.setText(&quot;Login&quot;);</span>
+<span class="fc" id="L273">        login.addActionListener(new java.awt.event.ActionListener() {</span>
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+<span class="fc" id="L275">                loginActionPerformed(evt);</span>
+<span class="fc" id="L276">            }</span>
+        });
+
+<span class="fc" id="L279">        feature3.setText(&quot;rent&quot;);</span>
+<span class="fc" id="L280">        feature3.addActionListener(new java.awt.event.ActionListener() {</span>
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+<span class="fc" id="L282">                feature3ActionPerformed(evt);</span>
+<span class="fc" id="L283">            }</span>
+        });
+
+<span class="fc" id="L286">        feature1.setText(&quot;feature1&quot;);</span>
+<span class="fc" id="L287">        feature1.addActionListener(new java.awt.event.ActionListener() {</span>
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+<span class="fc" id="L289">                feature1ActionPerformed(evt);</span>
+<span class="fc" id="L290">            }</span>
+        });
+
+<span class="fc" id="L293">        feature2.setText(&quot;feature2&quot;);</span>
+<span class="fc" id="L294">        feature2.addActionListener(new java.awt.event.ActionListener() {</span>
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+<span class="fc" id="L296">                feature2ActionPerformed(evt);</span>
+<span class="fc" id="L297">            }</span>
+        });
+
+<span class="fc" id="L300">        low_prices.setText(&quot;low prices&quot;);</span>
+
+<span class="fc" id="L302">        quality.setText(&quot;high quality&quot;);</span>
+
+<span class="fc" id="L304">        name_brand.add(byname);</span>
+<span class="fc" id="L305">        byname.setText(&quot;ByName&quot;);</span>
+
+<span class="fc" id="L307">        name_brand.add(bybrand);</span>
+<span class="fc" id="L308">        bybrand.setText(&quot;ByBrand&quot;);</span>
+
+<span class="fc" id="L310">        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());</span>
+<span class="fc" id="L311">        getContentPane().setLayout(layout);</span>
+<span class="fc" id="L312">        layout.setHorizontalGroup(</span>
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(choice, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(feature3)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Scroll, javax.swing.GroupLayout.PREFERRED_SIZE, 681, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(greeting, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(login, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(feature1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(feature2, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(396, 396, 396)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(byname))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(bybrand)))
+                                .addGap(32, 32, 32)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(low_prices)
+                                    .addComponent(SearchButton, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(quality)
+                                    .addComponent(search_text, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addContainerGap())
+        );
+<span class="fc" id="L356">        layout.setVerticalGroup(</span>
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(login)
+                            .addComponent(feature1)
+                            .addComponent(feature2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(greeting, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(search_text, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(SearchButton)
+                            .addComponent(byname))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(low_prices)
+                            .addComponent(quality)
+                            .addComponent(bybrand))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1)
+                    .addComponent(Scroll))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(choice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(feature3))
+                .addGap(23, 23, 23))
+        );
+
+<span class="fc" id="L391">        pack();</span>
+<span class="fc" id="L392">    }// &lt;/editor-fold&gt;//GEN-END:initComponents</span>
+
+    private void MenuValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_MenuValueChanged
+        // TODO add your handling code here:
+		String path;
+		//x will have the selection path of the tree
+		try{
+<span class="fc" id="L399">			path=Menu.getSelectionPath().toString();</span>
+<span class="nc" id="L400">		}catch(Exception e){</span>
+<span class="nc" id="L401">			System.out.println(e);</span>
+<span class="nc" id="L402">			return;</span>
+<span class="fc" id="L403">		}</span>
+<span class="fc" id="L404">		brandBased=true;</span>
+		//split the string with the path between the commas.
+		//example:if path=[Products,Cars,BMW] then tokens[0]=&quot;[Products&quot;;tokens[1]=&quot;Cars&quot;;tokens[2]=&quot;BMW]&quot;
+		
+<span class="fc" id="L408">		tokens=path.split(&quot;,&quot;);</span>
+		
+<span class="pc bpc" id="L410" title="1 of 2 branches missed.">		if(tokens.length&lt;3) return;</span>
+		//fix the '[' ']' characters
+<span class="fc" id="L412">		tokens[0]=tokens[0].replace(&quot;[&quot;,&quot;&quot;);</span>
+<span class="fc" id="L413">		tokens[2]=tokens[2].replace(&quot;]&quot;,&quot;&quot;);</span>
+		
+		//fix spaces
+<span class="fc" id="L416">		tokens[0]=tokens[0].replace(&quot; &quot;,&quot;&quot;);</span>
+<span class="fc" id="L417">		tokens[1]=tokens[1].replace(&quot; &quot;,&quot;&quot;);</span>
+<span class="fc" id="L418">		tokens[2]=tokens[2].replace(&quot; &quot;,&quot;&quot;);</span>
+		
+		
+		//debug text
+<span class="fc" id="L422">		System.out.println(&quot;tokens[0]: &quot;+tokens[0]);</span>
+<span class="fc" id="L423">		System.out.println(&quot;tokens[1]: &quot;+tokens[1]);</span>
+<span class="fc" id="L424">		System.out.println(&quot;tokens[2]: &quot;+tokens[2]);</span>
+		
+		
+		//the tokens[] array is like this: tokens[0]=&quot;Products&quot;; tokens[1]=&quot;type&quot;;tokens[2]=&quot;brand&quot;;
+		//example type=Cars and model=BMW tokens[0]=&quot;Products&quot;; tokens[1]=&quot;Cars&quot;; tokens[2]=&quot;BMW&quot;;
+		//query needed for selection based on menu choice: query=&quot;SELECT * FROM storage WHERE type=tokens[1] AND brand=tokens[2]&quot;;
+		//if type=&quot;Cars&quot; and model=&quot;BMW&quot; then query=&quot;SELECT * FROM Storage WHERE type='cars' AND brand='BMW'&quot;;
+<span class="pc bpc" id="L431" title="1 of 4 branches missed.">		if(con==null) if(!connect(con_host,con_user,con_pass)){JOptionPane.showMessageDialog(this, &quot;Problem with database&quot;);return;}</span>
+<span class="fc" id="L432">		String type=tokens[1];</span>
+<span class="fc" id="L433">		String brand=tokens[2];	</span>
+		//fix the type
+<span class="pc bpc" id="L435" title="1 of 2 branches missed.">		if(type.equals(&quot;Cars&quot;)) type=&quot;car&quot;;</span>
+<span class="nc" id="L436">		else type=&quot;cycle&quot;;</span>
+		
+<span class="fc" id="L438">		String query=&quot;select * from storage where type='&quot;+type+&quot;' and brand='&quot;+brand+&quot;'&quot;;</span>
+		
+		try{
+			//execute the query and print the results.
+<span class="fc" id="L442">			rs=st.executeQuery(query);</span>
+<span class="fc" id="L443">			String titles[]={&quot;id&quot;,&quot;type&quot;,&quot;name&quot;,&quot;brand&quot;,&quot;price&quot;,&quot;rented&quot;};</span>
+			boolean found;
+<span class="fc" id="L445">			found=print(6,titles,titles,rs);</span>
+<span class="pc bpc" id="L446" title="1 of 2 branches missed.">			if(found==false)Results.setText(&quot;no items found\n&quot;);</span>
+<span class="pc" id="L447">		}catch(Exception e){System.err.println(e);}</span>
+		
+<span class="fc" id="L449">    }//GEN-LAST:event_MenuValueChanged</span>
+
+	
+    private void loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginActionPerformed
+        // TODO add your handling code here:
+<span class="fc" id="L454">		String uname=&quot;&quot;;</span>
+<span class="fc" id="L455">		String pw=&quot;&quot;;</span>
+		String query;
+		int pr;
+		int id;
+<span class="fc bfc" id="L459" title="All 2 branches covered.">		if(logged_in==false){</span>
+<span class="fc" id="L460">			ArrayList&lt;String&gt; ret=new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L461">			String tokens[]={&quot;Username&quot;,&quot;Password&quot;};</span>
+			//if tested
+<span class="pc bpc" id="L463" title="1 of 2 branches missed.">			if(test){</span>
+				//test_case=0 =&gt; user login
+<span class="fc bfc" id="L465" title="All 2 branches covered.">				if(test_case==0){</span>
+<span class="fc" id="L466">					uname=&quot;alkis&quot;;</span>
+<span class="fc" id="L467">					pw=&quot;alk123&quot;;</span>
+<span class="fc bfc" id="L468" title="All 2 branches covered.">				}else if(test_case==1){//test_case=1 =&gt; employee login</span>
+<span class="fc" id="L469">					uname=&quot;employee&quot;;</span>
+<span class="fc" id="L470">					pw=&quot;emp&quot;;</span>
+<span class="fc bfc" id="L471" title="All 2 branches covered.">				}else if(test_case==2){//test_case=2 =&gt; admin login</span>
+<span class="fc" id="L472">					uname=&quot;admin&quot;;</span>
+<span class="fc" id="L473">					pw=&quot;admin&quot;;</span>
+<span class="pc bpc" id="L474" title="1 of 2 branches missed.">				}else if(test_case==3){//test_case=3 =&gt; wrong login</span>
+<span class="fc" id="L475">					uname=&quot;something&quot;;</span>
+<span class="fc" id="L476">					pw=&quot;what?&quot;;</span>
+				}
+			}else{
+<span class="nc" id="L479">				ret=p_panel(2, tokens,1,&quot;Login&quot;);</span>
+<span class="nc bnc" id="L480" title="All 2 branches missed.">				if(ret==null) return;</span>
+<span class="nc" id="L481">				uname=ret.get(0);</span>
+<span class="nc" id="L482">				pw=ret.get(1);</span>
+			}
+<span class="fc" id="L484">			System.out.println(uname+&quot; &quot;+pw);</span>
+<span class="pc bpc" id="L485" title="1 of 4 branches missed.">			if(con==null) if(!connect(con_host,con_user,con_pass)){JOptionPane.showMessageDialog(this,&quot;Problem with database&quot;);return;}</span>
+			
+			
+<span class="fc" id="L488">			query=&quot;select * from users where username='&quot;+uname+&quot;' and password='&quot;+pw+&quot;'&quot;;</span>
+			try{
+<span class="fc" id="L490">				rs=st.executeQuery(query);</span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">				if(rs.next()==false)JOptionPane.showMessageDialog(this,&quot;wrong username or password&quot;);</span>
+				else{
+<span class="fc" id="L493">					pr=rs.getInt(&quot;permissions&quot;);</span>
+<span class="fc" id="L494">					id=rs.getInt(&quot;id&quot;);</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">					if(pr==1) user=new customer(uname,pw,id);</span>
+<span class="fc bfc" id="L496" title="All 2 branches covered.">					else if(pr==2) user=new employee(uname,pw,id);</span>
+<span class="fc" id="L497">					else user=new admin(uname,pw,id);</span>
+<span class="fc" id="L498">					login.setText(&quot;logout&quot;);</span>
+<span class="fc" id="L499">					logged_in=true;</span>
+<span class="fc" id="L500">					greeting.setText(&quot;hello &quot;+uname);</span>
+<span class="fc bfc" id="L501" title="All 2 branches covered.">					if(user.privileges==1){</span>
+<span class="fc" id="L502">						feature1.setText(&quot;show rents&quot;);</span>
+<span class="fc" id="L503">						feature2.setText(&quot;clear rents&quot;);</span>
+<span class="fc" id="L504">						feature3.setText(&quot;rent&quot;);</span>
+					}
+<span class="fc bfc" id="L506" title="All 2 branches covered.">					else if(user.privileges==2){</span>
+<span class="fc" id="L507">						feature1.setText(&quot;insert product&quot;);</span>
+<span class="fc" id="L508">						feature2.setText(&quot;delete product&quot;);</span>
+<span class="fc" id="L509">						feature3.setText(&quot;Show Storage&quot;);</span>
+					}
+<span class="pc bpc" id="L511" title="1 of 2 branches missed.">					else if(user.privileges==3){</span>
+<span class="fc" id="L512">						feature1.setText(&quot;create user&quot;);</span>
+<span class="fc" id="L513">						feature2.setText(&quot;delete user&quot;);</span>
+<span class="fc" id="L514">						feature3.setText(&quot;Show Users&quot;);</span>
+						
+					}
+					
+<span class="fc" id="L518">					feature1.setVisible(true);</span>
+<span class="fc" id="L519">					feature2.setVisible(true);</span>
+					
+				}
+				
+				
+<span class="nc" id="L524">			}catch(Exception e){</span>
+<span class="nc" id="L525">				System.err.println(e);</span>
+<span class="fc" id="L526">			}</span>
+				
+<span class="fc" id="L528">		}else{</span>
+<span class="fc" id="L529">			user=null;</span>
+<span class="fc" id="L530">			logged_in=false;</span>
+<span class="fc" id="L531">			login.setText(&quot;login&quot;);</span>
+<span class="fc" id="L532">			greeting.setText(&quot;&quot;);</span>
+<span class="fc" id="L533">			feature1.setVisible(false);</span>
+<span class="fc" id="L534">			feature2.setVisible(false);</span>
+		}
+		
+	
+<span class="fc" id="L538">    }//GEN-LAST:event_loginActionPerformed</span>
+
+    private void feature3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_feature3ActionPerformed
+        // TODO add your handling code here:
+		
+		//if customer then feature3 will be rent
+<span class="pc bpc" id="L544" title="1 of 2 branches missed.">		if(user==null)return;</span>
+		
+<span class="fc bfc" id="L546" title="All 2 branches covered.">		if(user.privileges==1){</span>
+<span class="fc" id="L547">			int selection_id=-1;</span>
+			//get the selected car id for rent
+<span class="pc bpc" id="L549" title="1 of 2 branches missed.">			if(tokens.length&lt;3){</span>
+<span class="nc" id="L550">				JOptionPane.showMessageDialog(this,&quot;please select brand&quot;);</span>
+<span class="nc" id="L551">				return ;</span>
+			}
+			try{
+<span class="pc bpc" id="L554" title="1 of 2 branches missed.">				if(test) selection_id=1;</span>
+<span class="nc" id="L555">				else selection_id=Integer.parseInt(choice.getText());</span>
+				
+<span class="nc" id="L557">			}catch(Exception e){</span>
+<span class="nc" id="L558">				System.err.println(e);</span>
+<span class="nc" id="L559">				JOptionPane.showMessageDialog(this, &quot;Enter a valid selection&quot;);</span>
+<span class="nc" id="L560">				return;</span>
+<span class="fc" id="L561">			}</span>
+			String type,brand;
+<span class="pc bpc" id="L563" title="1 of 2 branches missed.">			if(tokens[1].equals(&quot;Cars&quot;)) type=&quot;car&quot;;</span>
+<span class="nc" id="L564">			else type=&quot;cycle&quot;;</span>
+
+<span class="fc" id="L566">			brand=tokens[2];</span>
+		
+		
+<span class="pc bpc" id="L569" title="3 of 4 branches missed.">			if(con==null) if(!connect(con_host,con_user, con_pass)){JOptionPane.showMessageDialog(this,&quot;Problem with database&quot;);return;}</span>
+			
+			int ret_code;
+<span class="pc bpc" id="L572" title="1 of 2 branches missed.">			if(test){</span>
+<span class="fc bfc" id="L573" title="All 2 branches covered.">				if(test_case&lt;3)ret_code=test_case;</span>
+<span class="fc" id="L574">				else ret_code=-1;	</span>
+			}
+<span class="nc" id="L576">			else ret_code=((customer)user).rent(selection_id,type,brand,con,st,rs,brandBased);</span>
+		
+<span class="fc bfc" id="L578" title="All 2 branches covered.">			if(ret_code==1){JOptionPane.showMessageDialog(this,&quot;Item does not exist&quot;);return;}</span>
+<span class="fc bfc" id="L579" title="All 2 branches covered.">			else if(ret_code==2){JOptionPane.showMessageDialog(this,&quot;Item already rented&quot;);return;}</span>
+<span class="fc bfc" id="L580" title="All 2 branches covered.">			else if(ret_code==-1){JOptionPane.showMessageDialog(this,&quot;Backend problem&quot;);return;}</span>
+			
+			try{
+<span class="fc" id="L583">				String query=&quot;select * from storage where type='&quot;+type+&quot;' and brand='&quot;+brand+&quot;'&quot;;</span>
+<span class="fc" id="L584">				String titles[]={&quot;id&quot;,&quot;type&quot;,&quot;name&quot;,&quot;brand&quot;,&quot;price&quot;,&quot;rented&quot;};</span>
+<span class="fc" id="L585">				rs=st.executeQuery(query);</span>
+<span class="fc" id="L586">				boolean found=print(6,titles,titles,rs);</span>
+<span class="pc bpc" id="L587" title="1 of 2 branches missed.">				if(found==false) Results.setText(&quot;no items found\n&quot;);</span>
+<span class="pc" id="L588">			}catch(Exception e){System.err.println(e);}</span>
+		
+<span class="fc bfc" id="L590" title="All 2 branches covered.">		}else if(user.privileges==2){//if user is an employee then show the storage.</span>
+<span class="fc" id="L591">			rs=((employee)user).show_storage(con, st, rs);</span>
+<span class="pc bpc" id="L592" title="1 of 2 branches missed.">			if(rs==null){JOptionPane.showMessageDialog(this, &quot;Backend problem&quot;);return;}</span>
+<span class="fc" id="L593">			String titles[]={&quot;id&quot;,&quot;type&quot;,&quot;name&quot;,&quot;brand&quot;,&quot;CC&quot;,&quot;rented&quot;,&quot;price&quot;};</span>
+			try{
+<span class="fc" id="L595">				boolean found=print(7,titles,titles,rs);</span>
+<span class="pc" id="L596">			}catch(SQLException e){System.err.println(e);return;}</span>
+			
+		
+<span class="pc bpc" id="L599" title="1 of 2 branches missed.">		}else if(user.privileges==3){//if user is admin then show the users.</span>
+<span class="fc" id="L600">			rs=((admin)user).show_users(con,st,rs);</span>
+<span class="pc bpc" id="L601" title="1 of 2 branches missed.">			if(rs==null){</span>
+<span class="nc" id="L602">				JOptionPane.showMessageDialog(this, &quot;Backend problem&quot;);</span>
+<span class="nc" id="L603">				return;</span>
+			}
+			try{
+<span class="fc" id="L606">				String titles[]={&quot;id&quot;,&quot;username&quot;,&quot;permissions&quot;};</span>
+<span class="fc" id="L607">				print(3,titles,titles,rs);</span>
+<span class="pc" id="L608">			}catch(SQLException e){System.err.println(e);return;}</span>
+			
+		}
+<span class="fc" id="L611">    }//GEN-LAST:event_feature3ActionPerformed</span>
+
+	//first invi button
+    private void feature1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_feature1ActionPerformed
+        // TODO add your handling code here:
+		//if simple user then show rents
+<span class="pc bpc" id="L617" title="3 of 4 branches missed.">		if(con==null)if(!connect(con_host, con_user, con_pass)){JOptionPane.showMessageDialog(this,&quot;Problem with database&quot;);return;}</span>
+<span class="pc bpc" id="L618" title="1 of 2 branches missed.">		if(user.privileges==1){</span>
+<span class="nc" id="L619">			rs=((customer)user).show_rents(con,st,rs);</span>
+			try{
+				//type\tname\tbrand\tprice\n
+<span class="nc" id="L622">				String titles[]={&quot;type&quot;,&quot;name&quot;,&quot;brand&quot;,&quot;price&quot;};</span>
+<span class="nc bnc" id="L623" title="All 2 branches missed.">				if(!print(4,titles,titles,rs))Results.setText(&quot;You have no rents&quot;);</span>
+<span class="nc" id="L624">			}catch(SQLException e){</span>
+<span class="nc" id="L625">				System.err.println(e);</span>
+<span class="nc" id="L626">			}</span>
+//if employee then insert new product in storage		
+<span class="fc bfc" id="L628" title="All 2 branches covered.">		}else if(user.privileges==2){</span>
+<span class="fc" id="L629">			String in[]={&quot;type&quot;,&quot;name&quot;,&quot;brand&quot;,&quot;CC&quot;,&quot;price&quot;};</span>
+			String type;
+			String name;
+			String brand;
+			int price;
+			int CC;
+<span class="fc" id="L635">			ArrayList&lt;String&gt; ret=new ArrayList(5);</span>
+<span class="pc bpc" id="L636" title="1 of 2 branches missed.">			if(test){</span>
+<span class="fc" id="L637">				type=&quot;car&quot;;</span>
+<span class="fc" id="L638">				name=&quot;m3&quot;;</span>
+<span class="fc" id="L639">				brand=&quot;BMW&quot;;</span>
+<span class="fc" id="L640">				CC=1800;</span>
+<span class="fc" id="L641">				price=20000;</span>
+			}
+			else{ 
+<span class="nc" id="L644">				ret=panel(5, in,&quot;Product Information&quot;);</span>
+	
+<span class="nc bnc" id="L646" title="All 2 branches missed.">				if(ret==null) return;</span>
+<span class="nc" id="L647">				type=ret.get(0);</span>
+<span class="nc" id="L648">				name=ret.get(1);</span>
+<span class="nc" id="L649">				brand=ret.get(2);</span>
+			
+
+<span class="nc" id="L652">				try{CC=Integer.parseInt(ret.get(3));}catch(NumberFormatException e){System.err.println(e);CC=-1;}</span>
+
+<span class="nc" id="L654">				try{price=Integer.parseInt(ret.get(4));}catch(NumberFormatException e){System.out.println(e);price=-1;}</span>
+			}		
+			int ret_code;
+<span class="pc bpc" id="L657" title="1 of 2 branches missed.">			if(test) {</span>
+<span class="fc bfc" id="L658" title="All 2 branches covered.">				if(test_case&lt;6) ret_code=test_case;</span>
+<span class="fc" id="L659">				else ret_code=-1;</span>
+			}
+<span class="nc" id="L661">			else ret_code=((employee)user).insert_model(con,st,rs,type,name,brand,CC,price);</span>
+			
+<span class="fc bfc" id="L663" title="All 2 branches covered.">			if(ret_code==-1){JOptionPane.showMessageDialog(this, &quot;Backend Problem&quot;);return;}</span>
+<span class="fc bfc" id="L664" title="All 2 branches covered.">			else if(ret_code==1){JOptionPane.showMessageDialog(this,&quot;you should enter car or cycle&quot;); return;}</span>
+<span class="fc bfc" id="L665" title="All 2 branches covered.">			else if(ret_code==2){JOptionPane.showMessageDialog(this, &quot;You should enter a valid name&quot;); return;}</span>
+<span class="fc bfc" id="L666" title="All 2 branches covered.">			else if(ret_code==3){JOptionPane.showMessageDialog(this,&quot;You should enter a valid brand&quot;);return;}</span>
+<span class="fc bfc" id="L667" title="All 2 branches covered.">			else if(ret_code==4){JOptionPane.showMessageDialog(this, &quot;You should enter valid CC&quot;); return;}</span>
+<span class="fc bfc" id="L668" title="All 2 branches covered.">			else if(ret_code==5){JOptionPane.showMessageDialog(this, &quot;You should enter a valid price&quot;); return;}</span>
+<span class="fc" id="L669">			JOptionPane.showMessageDialog(this, &quot;success&quot;);</span>
+			
+<span class="fc" id="L671">		}//if admin then insert new user</span>
+<span class="pc bpc" id="L672" title="1 of 2 branches missed.">		else if(user.privileges==3){</span>
+<span class="fc" id="L673">			String tokens[]={&quot;Username for new user:&quot;,&quot;password for new user&quot;,&quot;privileges(1 for user,2 for employee,3 for admin&quot;};</span>
+<span class="fc" id="L674">			ArrayList&lt;String&gt; ret=null;</span>
+			String uname;
+			String password;
+			int privileges;
+<span class="pc bpc" id="L678" title="1 of 2 branches missed.">			if(test){</span>
+<span class="fc" id="L679">				uname=&quot;something&quot;;</span>
+<span class="fc" id="L680">				password=&quot;something&quot;;</span>
+<span class="fc" id="L681">				privileges=1;</span>
+			}
+			else {
+<span class="nc" id="L684">				ret=GUI.p_panel(3,tokens,1,&quot;Insert user information&quot;);</span>
+<span class="nc bnc" id="L685" title="All 2 branches missed.">				if(ret==null) return;</span>
+
+<span class="nc" id="L687">				uname=ret.get(0);</span>
+<span class="nc" id="L688">				password=ret.get(1);</span>
+		
+			
+				try{
+<span class="nc" id="L692">					privileges=Integer.parseInt(ret.get(2));</span>
+<span class="nc" id="L693">				}catch(Exception e){privileges=-1;}</span>
+			}
+			
+			
+			int ret_code;
+<span class="pc bpc" id="L698" title="1 of 2 branches missed.">			if(test){</span>
+<span class="fc bfc" id="L699" title="All 2 branches covered.">				if(test_case&lt;4)ret_code=test_case;</span>
+<span class="fc" id="L700">				else ret_code=-1;</span>
+			}
+<span class="nc" id="L702">			else ret_code=((admin)user).insert_user(con,st,rs,uname,password,privileges);</span>
+			
+<span class="fc bfc" id="L704" title="All 2 branches covered.">			if(ret_code==1){JOptionPane.showMessageDialog(this,&quot;Enter a valid username&quot;);return;}</span>
+<span class="fc bfc" id="L705" title="All 2 branches covered.">			else if(ret_code==2){JOptionPane.showMessageDialog(this, &quot;Enter a valid passowrd&quot;);return;}</span>
+<span class="fc bfc" id="L706" title="All 2 branches covered.">			else if(ret_code==3){JOptionPane.showMessageDialog(this, &quot;Enter valid privileges (1,2,3)&quot;);return;}</span>
+<span class="fc bfc" id="L707" title="All 2 branches covered.">			else if(ret_code==-1){JOptionPane.showMessageDialog(this,&quot;Backend Problem&quot;);return;}</span>
+<span class="fc" id="L708">			String query=&quot;select * from users&quot;;</span>
+			try{
+<span class="fc" id="L710">				rs=st.executeQuery(query);</span>
+<span class="fc" id="L711">				String titles[]={&quot;id&quot;,&quot;username&quot;,&quot;permissions&quot;};</span>
+<span class="fc" id="L712">				print(3,titles,titles,rs);</span>
+				
+<span class="pc" id="L714">			}catch(SQLException e){System.err.println(e);}	</span>
+		}
+		
+<span class="fc" id="L717">    }//GEN-LAST:event_feature1ActionPerformed</span>
+	//second invi button
+    private void feature2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_feature2ActionPerformed
+        // TODO add your handling code here:
+<span class="pc bpc" id="L721" title="3 of 4 branches missed.">		if(con==null)if(!connect(con_host, con_user, con_pass)){JOptionPane.showMessageDialog(this,&quot;Problem with database&quot;);return;}</span>
+		String query;
+		//if simple user delete the current cart of rents.
+<span class="fc bfc" id="L724" title="All 2 branches covered.">		if(user.privileges==1){</span>
+			int choice;
+<span class="pc bpc" id="L726" title="1 of 2 branches missed.">			if(test) choice=0;</span>
+<span class="nc" id="L727">			else choice=JOptionPane.showConfirmDialog(this,&quot;Are you sure?&quot;);</span>
+			
+<span class="pc bpc" id="L729" title="1 of 2 branches missed.">			if(choice==0){</span>
+<span class="fc" id="L730">				int ret_code=0;</span>
+<span class="pc bpc" id="L731" title="1 of 2 branches missed.">				if(test){</span>
+<span class="fc bfc" id="L732" title="All 2 branches covered.">					if(test_case==0) ret_code=0;</span>
+<span class="fc bfc" id="L733" title="All 2 branches covered.">					else if(test_case==1) ret_code=1;</span>
+<span class="pc bpc" id="L734" title="1 of 2 branches missed.">					else if(test_case==2) ret_code=-1;</span>
+				}
+<span class="nc" id="L736">				else ret_code=((customer)user).delete_rents(con,st,rs);</span>
+				
+<span class="fc bfc" id="L738" title="All 2 branches covered.">				if(ret_code==1){JOptionPane.showMessageDialog(this,&quot;You have no rents to delete&quot; );return;}</span>
+<span class="fc bfc" id="L739" title="All 2 branches covered.">				else if(ret_code==0){JOptionPane.showMessageDialog(this,&quot;deletion successfull&quot;);return;}</span>
+<span class="pc bpc" id="L740" title="1 of 2 branches missed.">				else if(ret_code==-1){JOptionPane.showMessageDialog(this,&quot;Backend error&quot;);return;}	</span>
+			
+			}
+<span class="pc bfc" id="L743" title="All 2 branches covered.">		}else if(user.privileges==2){</span>
+			int id;
+			try{
+<span class="pc bpc" id="L746" title="1 of 2 branches missed.">				if(test) id=1;</span>
+<span class="nc" id="L747">				else id=Integer.parseInt(JOptionPane.showInputDialog(&quot;id for removal:&quot;));</span>
+<span class="pc" id="L748">			}catch(NumberFormatException e){id=-1;}</span>
+<span class="fc" id="L749">			int ret_code=0;</span>
+			
+<span class="pc bpc" id="L751" title="1 of 2 branches missed.">			if(test){</span>
+<span class="fc bfc" id="L752" title="All 2 branches covered.">				if(test_case==0) ret_code=0;</span>
+<span class="fc bfc" id="L753" title="All 2 branches covered.">				else if(test_case==1) ret_code=1;</span>
+<span class="fc bfc" id="L754" title="All 2 branches covered.">				else if(test_case==2) ret_code=-1;</span>
+<span class="pc bpc" id="L755" title="1 of 2 branches missed.">				else if(test_case==3) ret_code=-2;</span>
+			}
+<span class="nc" id="L757">			else ret_code=((employee)user).remove_model(con,st,rs,id);</span>
+			
+<span class="fc bfc" id="L759" title="All 2 branches covered.">			if(ret_code==-1){JOptionPane.showMessageDialog(this, &quot;enter a valid product id&quot;);return;}</span>
+<span class="fc bfc" id="L760" title="All 2 branches covered.">			else if(ret_code==-2){JOptionPane.showMessageDialog(this, &quot;Backend problem&quot;);return;}</span>
+<span class="fc bfc" id="L761" title="All 2 branches covered.">			else if(ret_code==1){JOptionPane.showMessageDialog(this, &quot;product does not exist&quot;);return;}</span>
+<span class="fc" id="L762">			JOptionPane.showMessageDialog(this, &quot;deletion success&quot;);</span>
+		
+		
+<span class="fc" id="L765">		}//if administrator delete user</span>
+<span class="pc bpc" id="L766" title="1 of 2 branches missed.">		else if(user.privileges==3){</span>
+			try{
+<span class="fc" id="L768">				query=&quot;select * from users&quot;;</span>
+<span class="fc" id="L769">				rs=st.executeQuery(query);</span>
+<span class="fc" id="L770">				String titles[]={&quot;id&quot;,&quot;username&quot;,&quot;permissions&quot;};</span>
+<span class="fc" id="L771">				print(3,titles,titles,rs);</span>
+				
+				int id;
+				try{
+<span class="pc bpc" id="L775" title="1 of 2 branches missed.">					if(test) id=1;</span>
+<span class="nc" id="L776">					else id=Integer.parseInt(JOptionPane.showInputDialog(&quot;id for removal:&quot;));</span>
+<span class="pc" id="L777">				}catch(NumberFormatException e){id=-1;}</span>
+				
+<span class="fc" id="L779">				int ret_code=0;</span>
+<span class="pc bpc" id="L780" title="1 of 2 branches missed.">				if(test){</span>
+<span class="fc bfc" id="L781" title="All 2 branches covered.">					if(test_case==0) ret_code=0;</span>
+<span class="fc bfc" id="L782" title="All 2 branches covered.">					else if(test_case==1) ret_code=1;</span>
+<span class="fc bfc" id="L783" title="All 2 branches covered.">					else if(test_case==2) ret_code=-1;</span>
+<span class="pc bpc" id="L784" title="1 of 2 branches missed.">					else if(test_case==3) ret_code=-2;</span>
+<span class="nc" id="L785">				}else ret_code=((admin)user).delete_user(con, st, rs,id);</span>
+				
+<span class="fc bfc" id="L787" title="All 2 branches covered.">				if(ret_code==-1){JOptionPane.showMessageDialog(this,&quot;Enter a valid numeric id&quot;);return;}</span>
+<span class="fc bfc" id="L788" title="All 2 branches covered.">				else if(ret_code==-2){JOptionPane.showMessageDialog(this, &quot;Backend problem&quot;);return;}</span>
+<span class="fc bfc" id="L789" title="All 2 branches covered.">				else if(ret_code==1){JOptionPane.showMessageDialog(this, &quot;User does not exist&quot;);return;}</span>
+				
+<span class="fc" id="L791">				query=&quot;select * from users&quot;;</span>
+<span class="fc" id="L792">				rs=st.executeQuery(query);</span>
+<span class="fc" id="L793">				print(3,titles,titles,rs);</span>
+<span class="pc" id="L794">			}catch(SQLException e){System.err.println(e);return;}</span>
+<span class="fc" id="L795">			JOptionPane.showMessageDialog(this,&quot;deletion success&quot;);</span>
+		}
+		
+		
+<span class="fc" id="L799">    }//GEN-LAST:event_feature2ActionPerformed</span>
+
+    private void SearchButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchButtonActionPerformed
+        // TODO add your handling code here:
+<span class="pc bpc" id="L803" title="3 of 4 branches missed.">		if(con==null) if(!connect(con_host, con_user, con_pass)){JOptionPane.showMessageDialog(this,&quot;Problem with database&quot;);return;}</span>
+<span class="fc" id="L804">		String keyword=search_text.getText();</span>
+<span class="fc" id="L805">		boolean low=false;</span>
+<span class="fc" id="L806">		boolean high=false;</span>
+<span class="fc" id="L807">		boolean by_name=false;</span>
+<span class="fc" id="L808">		boolean by_brand=false;</span>
+<span class="fc" id="L809">		brandBased=false;</span>
+<span class="fc bfc" id="L810" title="All 2 branches covered.">		if(low_prices.isSelected()) low=true;</span>
+<span class="pc bpc" id="L811" title="1 of 2 branches missed.">		else if(quality.isSelected()) high=true;</span>
+		
+<span class="fc bfc" id="L813" title="All 2 branches covered.">		if(byname.isSelected()) by_name=true;</span>
+<span class="pc bpc" id="L814" title="1 of 2 branches missed.">		else if(bybrand.isSelected()) by_brand=true;</span>
+		
+<span class="fc" id="L816">		String query=&quot;&quot;;</span>
+<span class="fc bfc" id="L817" title="All 2 branches covered.">		if(by_name)</span>
+<span class="fc" id="L818">			query=&quot;select * from storage where name like '&quot;+keyword+&quot;%'&quot;;</span>
+<span class="pc bpc" id="L819" title="1 of 2 branches missed.">		else if(by_brand)</span>
+<span class="fc" id="L820">			query=&quot;select * from storage where brand like '&quot;+keyword+&quot;%'&quot;;</span>
+<span class="fc bfc" id="L821" title="All 2 branches covered.">		if(low)</span>
+<span class="fc" id="L822">			query=query+&quot; and price&lt;=2000&quot;;</span>
+<span class="pc bpc" id="L823" title="1 of 2 branches missed.">		else if(high)</span>
+<span class="nc" id="L824">			query=query+&quot; and price&gt;2000&quot;;</span>
+	
+		//JOptionPane.showMessageDialog(this, query);
+		
+		
+		
+		try{
+<span class="fc" id="L831">			String titles[]={&quot;id&quot;,&quot;type&quot;,&quot;name&quot;,&quot;brand&quot;,&quot;price&quot;,&quot;rented&quot;};</span>
+<span class="fc" id="L832">			rs=st.executeQuery(query);	</span>
+<span class="fc" id="L833">			items_list=new ArrayList&lt;Object&gt;();</span>
+<span class="fc bfc" id="L834" title="All 2 branches covered.">			while(rs.next()) items_list.add(rs.getInt(&quot;id&quot;));</span>
+<span class="fc" id="L835">			rs=st.executeQuery(query);</span>
+<span class="fc" id="L836">			boolean found=print(6,titles,titles,rs);</span>
+<span class="fc bfc" id="L837" title="All 2 branches covered.">			if(!found)JOptionPane.showMessageDialog(this,&quot;no matches found&quot;);</span>
+<span class="pc" id="L838">		}catch(SQLException e){System.err.println(e);return;}</span>
+		
+<span class="fc" id="L840">    }//GEN-LAST:event_SearchButtonActionPerformed</span>
+
+	
+	/**
+	 * @param args the command line arguments
+	 */
+	public static void main(String args[]) {
+		/* Set the Nimbus look and feel */
+        //&lt;editor-fold defaultstate=&quot;collapsed&quot; desc=&quot; Look and feel setting code (optional) &quot;&gt;
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+		 * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+		 */
+		try {
+<span class="nc bnc" id="L853" title="All 2 branches missed.">			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {</span>
+<span class="nc bnc" id="L854" title="All 2 branches missed.">				if (&quot;Nimbus&quot;.equals(info.getName())) {</span>
+<span class="nc" id="L855">					javax.swing.UIManager.setLookAndFeel(info.getClassName());</span>
+<span class="nc" id="L856">					break;</span>
+				}
+			}
+<span class="nc" id="L859">		} catch (ClassNotFoundException ex) {</span>
+<span class="nc" id="L860">			java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);</span>
+<span class="nc" id="L861">		} catch (InstantiationException ex) {</span>
+<span class="nc" id="L862">			java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);</span>
+<span class="nc" id="L863">		} catch (IllegalAccessException ex) {</span>
+<span class="nc" id="L864">			java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);</span>
+<span class="nc" id="L865">		} catch (javax.swing.UnsupportedLookAndFeelException ex) {</span>
+<span class="nc" id="L866">			java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);</span>
+<span class="nc" id="L867">		}</span>
+        //&lt;/editor-fold&gt;
+
+		/* Create and display the form */
+		
+		/*
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				new GUI().eternal();
+				
+				
+				
+			}
+		});*/
+<span class="nc" id="L881">		GUI f=new GUI();</span>
+<span class="nc" id="L882">		f.eternal();</span>
+		
+	
+<span class="nc" id="L885">	}</span>
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JTree Menu;
+    public static javax.swing.JTextArea Results;
+    private javax.swing.JScrollPane Scroll;
+    public javax.swing.JButton SearchButton;
+    public javax.swing.JRadioButton bybrand;
+    public javax.swing.JRadioButton byname;
+    private javax.swing.JTextField choice;
+    public javax.swing.JButton feature1;
+    public javax.swing.JButton feature2;
+    public javax.swing.JButton feature3;
+    private javax.swing.JLabel greeting;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
+    public javax.swing.JButton login;
+    public javax.swing.JCheckBox low_prices;
+    private javax.swing.ButtonGroup name_brand;
+    public javax.swing.JCheckBox quality;
+    public javax.swing.JTextField search_text;
+    // End of variables declaration//GEN-END:variables
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>admin.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;Rent2&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">rent</a> &gt; <span class="el_source">admin.java</span></div><h1>admin.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package rent;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author user
+ */
+public class admin extends User{
+	
+	public admin(String username,String password,int id){
+<span class="fc" id="L24">		super(username,password,id,3);</span>
+<span class="fc" id="L25">	}</span>
+	
+	
+	public int insert_user(Connection con,Statement st,ResultSet rs,String uname,String password,int privileges){
+			
+				
+<span class="pc bpc" id="L31" title="1 of 4 branches missed.">			if(uname.length()&lt;3 || uname==null) return 1;</span>
+<span class="pc bpc" id="L32" title="1 of 4 branches missed.">			if(password.length()&lt;3 || password==null) return 2;</span>
+<span class="pc bpc" id="L33" title="1 of 4 branches missed.">			if(privileges&gt;3 || privileges&lt;1) return 3;</span>
+			
+			try{
+<span class="fc" id="L36">				PreparedStatement ps=con.prepareStatement(&quot;insert into users(username,permissions,password) values(?,?,?)&quot;);</span>
+<span class="fc" id="L37">				ps.setString(1, uname);</span>
+<span class="fc" id="L38">				ps.setInt(2, privileges);</span>
+<span class="fc" id="L39">				ps.setString(3, password);</span>
+<span class="fc" id="L40">				ps.addBatch();</span>
+<span class="fc" id="L41">				ps.execute();</span>
+			
+<span class="fc" id="L43">			}catch(Exception e){System.err.println(e);return -1;}</span>
+			
+<span class="fc" id="L45">			return 0;</span>
+			
+	
+	}
+	
+	public int delete_user(Connection con,Statement st,ResultSet rs,int id){
+<span class="fc bfc" id="L51" title="All 2 branches covered.">		if(id&lt;0) return -1;</span>
+		try{
+<span class="fc" id="L53">			String query=&quot;delete from users where id=&quot;+id;</span>
+<span class="fc" id="L54">			int ret=st.executeUpdate(query);</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">			if(ret==0) return 1;</span>
+<span class="fc" id="L56">		}catch(Exception e){System.err.println(e);return -2;}</span>
+<span class="fc" id="L57">		return 0;</span>
+	}
+	
+	public ResultSet show_users(Connection con,Statement st,ResultSet rs){
+<span class="fc" id="L61">		String query=&quot;select * from users&quot;;</span>
+		try{
+<span class="fc" id="L63">			rs=st.executeQuery(query);</span>
+<span class="fc" id="L64">		}catch(Exception e){System.err.println(e);return null;}</span>
+<span class="fc" id="L65">		return rs;</span>
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.4.201312101107</span></div></body></html>
